@@ -49,4 +49,40 @@ router.post('/register', (req, res) => {
   });
 });
 
+
+router.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  pool.query('SELECT * FROM user WHERE email = ?', [email], async (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Erreur du serveur');
+    } 
+    else if (results.length > 0) {
+      const user = results[0];
+      // Vérifier le mot de passe
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (isMatch) {
+        // res.status(200).send('Connexion réussie');
+        // generate a token expire in 1hour
+        console.log('je veux le user.id' +user.id_user);
+        const token = jwt.sign({ id: user.id_user }, process.env.JWT_SECRET, {
+          expiresIn: '1h'
+        });
+
+        // // send the token to the client
+        res.status(200).json({ token });
+
+
+        // res.status(200).json({ message: 'Connexion réussie' });
+
+      } else {
+        res.status(401).send('Mot de passe incorrect');
+      }
+    } else {
+      res.status(404).send('Cet utilisateur n\'existe pas');
+    }
+  });
+});
+
 module.exports = router;

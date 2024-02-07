@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import axios from 'react-native-axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import { useNavigation } from '@react-navigation/native';
 
-const Register = () => {
+const Register = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -36,6 +37,9 @@ const Register = () => {
 
                     // // save the token in the local storage
                     // AsyncStorage.setItem('userToken', token);
+
+                    // navigate to the Home screen
+                    navigation.navigate('ChoixDiscipline');
                 })
                 .catch(error => {
                     console.error(error);

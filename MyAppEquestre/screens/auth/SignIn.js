@@ -9,21 +9,41 @@ const SignIn = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://monapi.com/auth/login', {
+      const response = await axios.post('http://10.0.2.2:3000/auth/login', {
         email,
         password
       });
 
-      // Gérer la réponse du serveur ici. Par exemple, sauvegarder le token, etc.
       console.log(response.data);
       Alert.alert("Succès", "Connexion réussie !");
-      // Sauvegarder le token dans le stockage sécurisé/local
-      await AsyncStorage.setItem('userToken', response.data.token);
-      // Navigation vers une autre écran après la connexion réussie
-      navigation.navigate('Home');
+      const token = response.data.token;
+      console.log('mon petit token' +token);
 
+      // Corrigez et appelez storeData ici
+      AsyncStorage.setItem('userToken', token)
+      .then(() => {
+        console.log('Token saved successfully!');
+      })
+      .catch(error => {
+        console.error('Error saving the token:', error);
+      });
+
+      // const verifyTokenInAsyncStorage = async () => {
+      //   try {
+      //     const token = await AsyncStorage.getItem('userToken');
+      //     console.log('Token retrieved from AsyncStorage:', token);
+      //     // Vous pouvez utiliser Alert.alert au lieu de console.log si vous voulez voir le token sur votre appareil
+      //     // Alert.alert("Token", token);
+      //   } catch (error) {
+      //     console.error('Error retrieving the token from AsyncStorage:', error);
+      //   }
+      // };
+
+      // verifyTokenInAsyncStorage();
+    
+
+      navigation.navigate('ChoixDiscipline');
     } catch (error) {
-      // Gérer les erreurs ici
       console.error(error);
       Alert.alert("Erreur", "Échec de la connexion !");
     }
