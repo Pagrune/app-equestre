@@ -28,14 +28,14 @@ router.post('/register', (req, res) => {
             console.error(error);
             res.status(500).send('Erreur du serveur');
           } else {
-            res.status(201).send('Utilisateur enregistré avec succès');
-            // // generate a token expire in 1hour
-            //  const token = jwt.sign({ id: results.insertId }, process.env.JWT_SECRET, {
-            //   expiresIn: '1h'
-            // });
+            // res.status(201).send('Utilisateur enregistré avec succès');
+            // generate a token expire in 1hour
+             const token = jwt.sign({ id: results.insertId }, process.env.JWT_SECRET, {
+              expiresIn: '1h'
+            });
 
-            // // send the token to the client
-            // res.status(201).json({ token });
+            // send the token to the client
+            res.status(201).json({ token });
                        
 
 

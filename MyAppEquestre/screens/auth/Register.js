@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import axios from 'react-native-axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -31,7 +32,10 @@ const Register = () => {
                 .then(response => {
                     Alert.alert("Succès", "Inscription réussie !");
                     // get the token from the response
-                    const token = response.data.token;
+                    // const token = response.data.token;
+
+                    // // save the token in the local storage
+                    // AsyncStorage.setItem('userToken', token);
                 })
                 .catch(error => {
                     console.error(error);
