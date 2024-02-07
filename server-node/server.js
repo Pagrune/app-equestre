@@ -1,6 +1,13 @@
 const express = require('express');
 const app = express();
 const authRouter = require('./router/authRouter.js');
+const mysql = require('mysql2/promise');
+require('dotenv').config();
+
+
+
+const pool = require('./services/BDD/dbConfig.js');
+
 
 app.use(express.json()); // Pour analyser les requêtes JSON
 
@@ -13,6 +20,17 @@ app.get('/', (req, res) => {
 app.use('/auth', authRouter);
 
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+
+  // Tester la connexion à la base de données
+  try {
+    const connection = await pool.getConnection();
+
+    // const [rows] = await connection.execute('SELECT * from user');
+    // console.log('Données de la table user :', rows);
+    console.log('Connexion à la base de données réussie');
+  } catch (error) {
+    console.error('Erreur lors de la connexion à la base de données :', error);
+  }
 });
