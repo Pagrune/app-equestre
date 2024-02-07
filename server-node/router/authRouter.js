@@ -1,45 +1,52 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const { pool } = require('../services/BDD/dbConfig.js');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-// Exemple de route d'inscription
 router.post('/register', (req, res) => {
-  // Votre logique d'inscription ici
+  const { email, password } = req.body;
+
+  // Nombre de tours pour le salage
+  const saltRounds = 10;
+
+  // Vérifier si l'utilisateur existe déjà
+  pool.query('SELECT * FROM user WHERE email = ?', [email], async (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Erreur du serveur');
+    } else if (results.length > 0) {
+      res.status(400).send('Cet utilisateur existe déjà');
+    } else {
+      // Hasher le mot de passe avant de l'insérer dans la base de données
+      try {
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        pool.query('INSERT INTO user (email, password) VALUES (?, ?)', [email, hashedPassword], (error, results) => {
+          if (error) {
+            console.error(error);
+            res.status(500).send('Erreur du serveur');
+          } else {
+            res.status(201).send('Utilisateur enregistré avec succès');
+            // // generate a token expire in 1hour
+            //  const token = jwt.sign({ id: results.insertId }, process.env.JWT_SECRET, {
+            //   expiresIn: '1h'
+            // });
+
+            // // send the token to the client
+            // res.status(201).json({ token });
+                       
+
+
+          }
+        });
+      } catch (hashError) {
+        console.error(hashError);
+        res.status(500).send('Erreur lors du hachage du mot de passe');
+      }
+    }
+  });
 });
-
-// // Exemple de route de connexion
-// router.post('/login', async (req, res) => {
-//   const { email, password } = req.body;
-
-//   try {
-//     // Vérifier si l'utilisateur existe dans la base de données
-//    const { rows } = await pool.query('SELECT * FROM user WHERE email = $1', [req.body.email]);
-//     if (rows.length > 0) {
-//       const user = rows[0];
-
-//       // Comparer le mot de passe fourni avec le mot de passe haché stocké
-//       const match = await bcrypt.compare(password, user.password);
-
-//       if (match) {
-//         // Générer un token JWT
-//         const token = jwt.sign(
-//           { userId: user.id },
-//           process.env.JWT_SECRET,
-//           { expiresIn: '1h' }
-//         );
-
-//         res.json({ token });
-//       } else {
-//         res.status(401).json({ message: 'Mot de passe incorrect' });
-//       }
-//     } else {
-//       res.status(404).json({ message: 'Utilisateur non trouvé' });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Erreur lors de la connexion' });
-//   }
-// });
 
 module.exports = router;

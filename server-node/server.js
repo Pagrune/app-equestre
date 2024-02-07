@@ -8,6 +8,8 @@ require('dotenv').config();
 
 const pool = require('./services/BDD/dbConfig.js');
 
+const cors = require('cors');
+app.use(cors());
 
 app.use(express.json()); // Pour analyser les requêtes JSON
 
