@@ -25,14 +25,14 @@ export default function App() {
         <Stack.Screen name="Register" component={Register} options={{ title: 'Inscription' }}/>
         <Stack.Screen 
           name="ChoixDiscipline" 
-          options={{ title: 'Choix de la discipline' }}
-          children={() => <ProtectedRoute Component={ChoixDiscipline} />}
-        />
+          options={{ title: 'Choix de la discipline' }}>
+          {props => <ProtectedRoute {...props} Component={ChoixDiscipline} />}
+        </Stack.Screen>
         <Stack.Screen 
           name="EnregCSO" 
-          options={{ title: 'Enregistrement CSO' }}
-          children={() => <ProtectedRoute Component={EnregCSO} />}
-        />
+          options={{ title: 'Enregistrement CSO' }}>
+          {props => <ProtectedRoute {...props} Component={EnregCSO} />}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ProtectedRoute = ({ navigation, Component }) => {
+const ProtectedRoute = ({ Component, ...rest }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -13,18 +13,20 @@ const ProtectedRoute = ({ navigation, Component }) => {
         if (token) {
           setIsAuthenticated(true);
         } else {
-          navigation.navigate('SignIn');
+          // Utilisez rest.navigation au lieu de navigation directement
+          rest.navigation.navigate('SignIn');
         }
       } catch (error) {
         console.error('Error retrieving the token:', error);
-        navigation.navigate('SignIn');
+        // Utilisez rest.navigation au lieu de navigation directement
+        rest.navigation.navigate('SignIn');
       } finally {
         setIsLoading(false);
       }
     };
 
     verifyToken();
-  }, [navigation]);
+  }, [rest.navigation]); // Utilisez rest.navigation dans le tableau de dépendances
 
   if (isLoading) {
     return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -32,7 +34,8 @@ const ProtectedRoute = ({ navigation, Component }) => {
     </View>;
   }
 
-  return isAuthenticated ? <Component /> : null;
+  // Assurez-vous de passer toutes les props à Component
+  return isAuthenticated ? <Component {...rest} /> : null;
 };
 
 export default ProtectedRoute;

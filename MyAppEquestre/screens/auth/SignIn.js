@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ImageBackground } from 'react-native';
 import axios from 'react-native-axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import bgImage from '../../img/fleur_background.png';
 
 const SignIn = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -50,37 +52,61 @@ const SignIn = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.containerout}>
+      <ImageBackground source={bgImage} resizeMode="cover" style={styles.image}>
+        <View style={styles.container}>
       <Text style={styles.title}>Me connecter</Text>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-        keyboardType="email-address"
+      <View style={styles.connexdiv}>
+        <TextInput
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+          keyboardType="email-address"
+        />
+        <TextInput
+          placeholder="Mot de passe"
+          value={password}
+          onChangeText={setPassword}
+          style={styles.input}
+          secureTextEntry
+        />
+      </View>
+      
+      <Button
+        title="Connexion"
+        onPress={handleLogin}
+        color="#BA7868"
       />
-      <TextInput
-        placeholder="Mot de passe"
-        value={password}
-        onChangeText={setPassword}
-        style={styles.input}
-        secureTextEntry
-      />
-      <Button title="Se connecter" onPress={handleLogin} />
+      </View>
+      </ImageBackground>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  containerout: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#EDDCD4',
+    position: 'relative',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     padding: 20,
   },
+  image: {
+    flex: 1,
+    justifyContent: 'center',
+    width: '100%',
+    height: '60%',
+  },
   title: {
     fontSize: 24,
     marginBottom: 20,
     textAlign: 'center',
+    fontWeight: 'bold',
   },
   input: {
     marginBottom: 15,
@@ -88,6 +114,14 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderRadius: 5,
     padding: 10,
+    backgroundColor: '#EDDCD4',
+    color: '#A68677',
+  },
+  connexdiv: {
+    backgroundColor : '#A68677',
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 20,
   },
 });
 

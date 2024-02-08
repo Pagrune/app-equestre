@@ -5,6 +5,8 @@ const EnregCSO = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Enregistrez votre concours de CSO</Text>
+
+            
             <Button title="Enregistrer" onPress={() => navigation.navigate('ChoixDiscipline')} />
         </View>
     );
