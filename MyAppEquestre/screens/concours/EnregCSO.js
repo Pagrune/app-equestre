@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, Platform, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
+import axios from 'react-native-axios';
 
 
 import bgImage from '../../img/fleur_background.png';
@@ -11,14 +12,37 @@ const EnregCSO = ({ navigation }) => {
     const [show, setShow] = useState(false);
     const [selectedValue, setSelectedValue] = useState("select");
 
+    // Mise à jour de la catégorie sélectionnée
+    const [categorie, setCategorie] = useState("");
+
+    useEffect(() => {
+        console.log("Catégorie sélectionnée mise à jour :", categorie);
+      }, [categorie]);
+      
+
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(null);
     const [items, setItems] = useState([
-        {label: 'Poney', value: 'poney'},
-        {label: 'Club', value: 'club'},
-        {label: 'Amateur', value: 'amateur'},
-        {label: 'Pro', value: 'pro'},
+        // Initialisation avec un tableau vide ou des valeurs par défaut
+        
     ]);
+
+    useEffect(() => {
+        // Récupération des catégories depuis le serveur
+        axios.get('http://10.0.2.2:3000/cat/categories')
+            .then(response => {
+                // Conversion de la structure des données reçues pour qu'elles correspondent
+                // à ce qui est attendu par DropDownPicker : [{label: 'Label', value: 'value'}, ...]
+                const updatedItems = response.data.map(cat => ({
+                    label: cat.categorie_name, // Utilisez cat.categorie_name ici
+                    value: cat.categorie_id.toString() // Convertit categorie_id en chaîne pour la value
+                }));
+                setItems(updatedItems);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }, []);
 
     const [openNiveau, setOpenNiveau] = useState(false);
     const [valueNiveau, setValueNiveau] = useState(null);
@@ -82,32 +106,38 @@ const EnregCSO = ({ navigation }) => {
                             // fontSize: 16,
                             fontWeight: 'bold',
                           }}
-                          zIndex={5000}
-                          zIndexInverse={6000}
+                        onChangeValue={(value) => {
+                            // console.log("Valeur sélectionnée :", value);
+                            setCategorie(value);
+                        }}
                     />
-                    <Text>Choisir le niveau</Text>
-                    <DropDownPicker
-                        // style={styles.dropdownPicker2}
-                        open={openNiveau}
-                        value={valueNiveau}
-                        items={itemsNiveau.map(item => ({
+                    {
+                    categorie && (
+                        <View>
+                        <Text>Choisir le niveau</Text>
+                        <DropDownPicker
+                            open={openNiveau}
+                            value={valueNiveau}
+                            items={itemsNiveau.map(item => ({
                             label: value ? `${value} ${item.label}` : item.label,
                             value: item.value
-                        }))}
-                        setOpen={setOpenNiveau}
-                        setValue={setValueNiveau}
-                        setItems={setItemsNiveau}
-                        style={styles.dropdownPicker2}
-                        dropDownContainerStyle={styles.dropdownContainer1}
-                        labelStyle={{
+                            }))}
+                            setOpen={setOpenNiveau}
+                            setValue={setValueNiveau}
+                            setItems={setItemsNiveau}
+                            style={styles.dropdownPicker2}
+                            dropDownContainerStyle={styles.dropdownContainer1}
+                            labelStyle={{
                             color: '#EDDCD4',
                             fontWeight: 'bold',
                             // Autres styles de texte ici
-                        }}
-                        zIndex={1}
-                        zIndexInverse={6000}
-                        // position="absolute"
-                    />
+                            }}
+                            zIndex={1}
+                            zIndexInverse={6000}
+                        />
+                        </View>
+                    )
+                    }
 
                 </View>
                 <TouchableOpacity
