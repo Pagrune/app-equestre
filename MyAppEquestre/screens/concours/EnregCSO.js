@@ -22,10 +22,7 @@ const EnregCSO = ({ navigation }) => {
 
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(null);
-    const [items, setItems] = useState([
-        // Initialisation avec un tableau vide ou des valeurs par défaut
-        
-    ]);
+    const [items, setItems] = useState([]);
 
     useEffect(() => {
         // Récupération des catégories depuis le serveur
@@ -42,6 +39,16 @@ const EnregCSO = ({ navigation }) => {
             .catch(error => {
                 console.error(error);
             });
+    }, []);
+
+    //Récupération des niveaux depuis le serveur
+    useEffect(() => {
+        if (categorie) {
+            axios.get('http://10.0.2.2:3000/cat/niveau')
+            .then(response => {
+            
+            });
+        }
     }, []);
 
     const [openNiveau, setOpenNiveau] = useState(false);

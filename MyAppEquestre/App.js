@@ -1,11 +1,14 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import SignIn from './screens/auth/SignIn';
 import Home from './screens/Home';
 import Register from './screens/auth/Register';
 import ChoixDiscipline from './screens/concours/ChoixDiscipline';
 import EnregCSO from './screens/concours/EnregCSO';
+import CreateCompteClient from './screens/compte/CreaCompteClient';
+
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,6 +35,11 @@ export default function App() {
           name="EnregCSO" 
           options={{ title: 'Enregistrement CSO' }}>
           {props => <ProtectedRoute {...props} Component={EnregCSO} />}
+        </Stack.Screen>
+        <Stack.Screen 
+          name="CreateCompteClient" 
+          options={{ title: 'Informations client' }}>
+          {props => <ProtectedRoute {...props} Component={CreateCompteClient} />}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>

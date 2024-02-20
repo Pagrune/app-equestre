@@ -34,13 +34,18 @@ const Register = ({ navigation }) => {
                 })
                 .then(response => {
                     Alert.alert("Succès", "Inscription réussie !");
-                    // get the token from the response
-                    // const token = response.data.token;
-
-                    // // save the token in the local storage
-                    // AsyncStorage.setItem('userToken', token);
-
-                    // navigate to the Home screen
+                    const token = response.data.token;
+                    console.log('mon petit token' +token);
+              
+                    // Corrigez et appelez storeData ici
+                    AsyncStorage.setItem('userToken', token)
+                    .then(() => {
+                      console.log('Token saved successfully!');
+                    })
+                    .catch(error => {
+                      console.error('Error saving the token:', error);
+                    });                
+              
                     navigation.navigate('ChoixDiscipline');
                 })
                 .catch(error => {
