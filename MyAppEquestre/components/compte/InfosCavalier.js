@@ -1,28 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, Image, TextInput , ImageBackground } from 'react-native';
 import axios from 'react-native-axios';
-import DropDownPicker from 'react-native-dropdown-picker';
-
-import bgImage from '../../img/fleur_background.png';
-
-import InfosCavalier from '../../components/compte/InfosCavalier';
-import InfosCheval from '../../components/compte/InfosCheval';
 
 
-const Compte = ({ navigation }) => {
+const InfosCavalier = ({ navigation }) => {
+    const [cavalier, setCavalier] = useState({});
 
+    useEffect(() => {
+    }, []);
 
     return (
-        <View style={styles.containerout}>
-            <ImageBackground source={bgImage} resizeMode="cover" style={styles.imagebg}>
-                <View style={styles.container}>
-                    <View style={styles.colorbg}>
-                        <Text style={styles.title}>Mes informations</Text>
-                        <InfosCavalier />
-                        <InfosCheval />
-                    </View>
+        <View>
+            
+                <View >
+                <Text style={styles.title}>Mes informations Cavalière</Text>
+        
+                
                 </View>
-            </ImageBackground>
+
         </View>
     );
 }
@@ -33,11 +28,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    colorbg: {
-        backgroundColor: 'rgba(166, 134, 119, 0.8)',
-        padding: 20,
-        borderRadius: 10,
-      },
     imagebg: {
         flex: 1,
         justifyContent: 'center',
@@ -66,4 +56,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Compte;
+export default InfosCavalier;

@@ -1,28 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, Image, TextInput , ImageBackground } from 'react-native';
 import axios from 'react-native-axios';
-import DropDownPicker from 'react-native-dropdown-picker';
-
-import bgImage from '../../img/fleur_background.png';
-
-import InfosCavalier from '../../components/compte/InfosCavalier';
-import InfosCheval from '../../components/compte/InfosCheval';
 
 
-const Compte = ({ navigation }) => {
+const EnregCheval = ({ navigation }) => {
 
+    useEffect(() => {
+    }, []);
 
     return (
-        <View style={styles.containerout}>
-            <ImageBackground source={bgImage} resizeMode="cover" style={styles.imagebg}>
-                <View style={styles.container}>
-                    <View style={styles.colorbg}>
-                        <Text style={styles.title}>Mes informations</Text>
-                        <InfosCavalier />
-                        <InfosCheval />
-                    </View>
+        <View>
+            
+                <View >
+                <Text style={styles.title}>Ajouter un cheval</Text>
+                <TextInput
+                    placeholder="Nom du cheval"
+                    style={styles.input}
+                />
+                <TextInput
+                    placeholder="Age du cheval"
+                    style={styles.input}
+                />
+
+                
                 </View>
-            </ImageBackground>
+
         </View>
     );
 }
@@ -33,11 +35,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    colorbg: {
-        backgroundColor: 'rgba(166, 134, 119, 0.8)',
-        padding: 20,
-        borderRadius: 10,
-      },
     imagebg: {
         flex: 1,
         justifyContent: 'center',
@@ -64,6 +61,15 @@ const styles = StyleSheet.create({
         height: 150, // Ajustez selon la taille désirée
         marginBottom: 8, // Espace entre l'image et le texte
     },
+    input: {
+        marginBottom: 15,
+        borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 5,
+        padding: 10,
+        backgroundColor: '#EDDCD4',
+        color: '#A68677',
+      },
 });
 
-export default Compte;
+export default EnregCheval;
