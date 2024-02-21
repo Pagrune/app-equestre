@@ -75,10 +75,10 @@ const EnregCSO = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.containerout}>
-            <ImageBackground source={bgImage} resizeMode="cover" style={styles.image}>
-            <View style={styles.container}>
-                <Text style={styles.title}>Enregistrez votre concours de CSO</Text>
+        <ImageBackground source={bgImage} resizeMode="cover" style={styles.imageBackground}>
+        <View style={styles.container}>
+            <View style={styles.colorbg}>
+                {/* <Text style={styles.title}>Enregistrez votre concours de CSO</Text>
                 <View>
                     <View >
                         <Text>Lieu</Text>
@@ -87,7 +87,7 @@ const EnregCSO = ({ navigation }) => {
                             style={styles.input}
                         />
                     </View>
-                    <Button title="Choisir une date" onPress={showDatepicker} />
+                    {/* <Button title="Choisir une date" onPress={showDatepicker} />
                     {show && (
                         <DateTimePicker
                             value={date}
@@ -95,7 +95,22 @@ const EnregCSO = ({ navigation }) => {
                             display="default"
                             onChange={onChange}
                         />
-                    )}
+                    )} */}
+                    {/* <Text>Date</Text>
+                    <View style={styles.flex}>
+                        <TextInput
+                            placeholder="JJ"
+                            style={styles.input}
+                        />
+                        <TextInput
+                            placeholder="MM"
+                            style={styles.input}
+                        />
+                        <TextInput
+                            placeholder="AAAA"
+                            style={styles.input}
+                        />
+                    </View>
                     <Text>Choisir ma catégorie d'épreuve</Text>
                    
                     <DropDownPicker
@@ -149,39 +164,36 @@ const EnregCSO = ({ navigation }) => {
                 </View>
                 <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate('ChoixDiscipline')}
+                onPress={() => navigation.navigate('Choix Discipline')}
                 >
                     <Text style={styles.buttonText}>Enregistrer</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
+                </View>
             </View>
             </ImageBackground>
-        </View>
     );
 };
 
 const styles = StyleSheet.create({
+    imageBackground: {
+        flex: 1,
+        justifyContent: 'center',
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
         padding: 20,
-      },
-    image: {
-        flex: 1,
-        justifyContent: 'center',
-        width: '100%',
-        height: '60%',
-      },
-    containerout: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        backgroundColor: '#EDDCD4',
-        position: 'relative',
-        // height: '100vh',
-      },
+    },
+    colorbg: {
+        backgroundColor: 'rgba(166, 134, 119, 0.8)',
+        // padding: 20,
+        // borderRadius: 10,
+    },
     title: {
         fontSize: 20,
         marginBottom: 20,
     },
+
     connexdiv: {
         backgroundColor : '#A68677',
         padding: 20,
@@ -227,6 +239,13 @@ const styles = StyleSheet.create({
         zIndex: 6000,
         position : 'absolute', 
       },
+      flex: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignSelf: 'stretch',
+        alignItems: 'center',
+      },
+      
     // Assurez-vous d'inclure la définition pour styles.input ici si elle est utilisée
 });
 

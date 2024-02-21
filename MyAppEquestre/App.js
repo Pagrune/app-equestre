@@ -6,8 +6,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Importez vos écrans ici...
 import SignIn from './screens/auth/SignIn';
 import Home from './screens/Home';
+import HomeConnect from './screens/HomeConnect';
 import Register from './screens/auth/Register';
+import Compte from './screens/compte/Compte';
 import ChoixDiscipline from './screens/concours/ChoixDiscipline';
+import EnregCSO from './screens/concours/EnregCSO';
 // Autres importations...
 import base64 from 'react-native-base64'
 
@@ -34,6 +37,7 @@ export default function App() {
 
       // const payload = await getPayloadFromToken(token);
       const now = Date.now() / 1000; // Date actuelle en secondes
+      console.log('Current time:', now);
       // console.log("salut bg");
       if (payload && payload.exp > now) {
         setIsSignedIn(true);
@@ -41,7 +45,7 @@ export default function App() {
       } else {
         setIsSignedIn(false);
       }
-      console.log('isSignedIn:', isSignedIn);
+      // console.log('isSignedIn:', isSignedIn);
     } catch (error) {
       console.error('Error retrieving the token from AsyncStorage:', error);
     }
@@ -57,6 +61,7 @@ export default function App() {
     verifyTokenInAsyncStorage();
   }, [token]);
 
+  console.log('isSignedIn deuxième verif:', isSignedIn);
 
   return (
     <NavigationContainer>
@@ -64,8 +69,10 @@ export default function App() {
         {isSignedIn ? (
           <>
             {/* Écrans pour les utilisateurs connectés */}
-            <Drawer.Screen name="Home" component={Home} />
+            <Drawer.Screen name="Home" component={HomeConnect} />
             <Drawer.Screen name="Choix Discipline" component={ChoixDiscipline} />
+            <Drawer.Screen name="EnregCSO" component={EnregCSO} />
+            <Drawer.Screen name="Compte" component={Compte} />
             {/* Ajoutez d'autres écrans ici si nécessaire */}
           </>
         ) : (

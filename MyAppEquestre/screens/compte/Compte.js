@@ -1,10 +1,12 @@
-import React from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Button, StyleSheet, TouchableOpacity, Image, TextInput , ImageBackground } from 'react-native';
 import axios from 'react-native-axios';
 import DropDownPicker from 'react-native-dropdown-picker';
 
+import bgImage from '../../img/fleur_background.png';
 
-const CreateCompteClient = ({ navigation }) => {
+
+const Compte = ({ navigation }) => {
     const [categorie, setCategorie] = useState("");
 
     useEffect(() => {
@@ -29,9 +31,11 @@ const CreateCompteClient = ({ navigation }) => {
     const [items, setItems] = useState([]);
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Mes informations</Text>
-            <TouchableOpacity style={styles.btn}>Général</TouchableOpacity>
+        <View style={styles.containerout}>
+            <ImageBackground source={bgImage} resizeMode="cover" style={styles.imagebg}>
+                <View style={styles.container}>
+                <Text style={styles.title}>Mes informations</Text>
+            {/* <TouchableOpacity style={styles.btn}>Général</TouchableOpacity>
             <TouchableOpacity style={styles.btn}>Cavalier</TouchableOpacity>
             <TouchableOpacity style={styles.btn}>Cheval</TouchableOpacity>
             <View style={styles.general}>
@@ -65,9 +69,11 @@ const CreateCompteClient = ({ navigation }) => {
                         }}
                     />
 
-            </View>
+            </View> */}
 
-            
+                
+                </View>
+            </ImageBackground>
         </View>
     );
 }
@@ -78,6 +84,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    imagebg: {
+        flex: 1,
+        justifyContent: 'center',
+        width: '100%',
+        height: '60%',
+      },
+    containerout: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        backgroundColor: '#EDDCD4',
+        position: 'relative',
+        // height: '100vh',
+      },
     title: {
         fontSize: 20,
         marginBottom: 20,
@@ -93,4 +112,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CreateCompteClient;
+export default Compte;
