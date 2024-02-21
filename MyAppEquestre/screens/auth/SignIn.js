@@ -5,10 +5,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import bgImage from '../../img/fleur_background.png';
 
+// import { AuthProvider, useAuth } from '../../AuthProvider';
+
 const SignIn = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // const { checkToken } = useAuth();
 
+  
   const handleLogin = async () => {
     try {
       const response = await axios.post('http://10.0.2.2:3000/auth/login', {
@@ -30,21 +34,11 @@ const SignIn = ({ navigation }) => {
         console.error('Error saving the token:', error);
       });
 
-      // const verifyTokenInAsyncStorage = async () => {
-      //   try {
-      //     const token = await AsyncStorage.getItem('userToken');
-      //     console.log('Token retrieved from AsyncStorage:', token);
-      //     // Vous pouvez utiliser Alert.alert au lieu de console.log si vous voulez voir le token sur votre appareil
-      //     // Alert.alert("Token", token);
-      //   } catch (error) {
-      //     console.error('Error retrieving the token from AsyncStorage:', error);
-      //   }
-      // };
-
-      // verifyTokenInAsyncStorage();
+      
+     
     
-
-      navigation.navigate('ChoixDiscipline');
+      // setIsSignedIn(true);
+      // navigation.navigate('ChoixDiscipline');
     } catch (error) {
       console.error(error);
       Alert.alert("Erreur", "Échec de la connexion !");
