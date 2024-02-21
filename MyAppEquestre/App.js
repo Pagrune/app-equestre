@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useContext} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,56 +16,38 @@ import base64 from 'react-native-base64'
 
 const Drawer = createDrawerNavigator();
 
+import { AuthProvider, useAuth } from './AuthProvider';
 
 
-export default function App() {
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [token, setToken] = useState('');
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
 
-  const verifyTokenInAsyncStorage = async () => {
-    try {
-      const token = await AsyncStorage.getItem('userToken');
-      console.log('Token retrieved from AsyncStorage:', token);
-      // Vous pouvez utiliser Alert.alert au lieu de console.log si vous voulez voir le token sur votre appareil
-      // Alert.alert("Token", token);
+function AppContent() {
+  const { isSignedIn, verifyToken } = useAuth(); // Utilisez useAuth ici
 
-      // base64 decode
-      const payloadBase64 = token.split('.')[1];
-      const payloadDecoded = base64.decode(payloadBase64);
-      const payload = JSON.parse(payloadDecoded);
-      console.log('Payload from token:', payload);
-
-      // const payload = await getPayloadFromToken(token);
-      const now = Date.now() / 1000; // Date actuelle en secondes
-      console.log('Current time:', now);
-      // console.log("salut bg");
-      if (payload && payload.exp > now) {
-        setIsSignedIn(true);
-
-      } else {
-        setIsSignedIn(false);
-      }
-      // console.log('isSignedIn:', isSignedIn);
-    } catch (error) {
-      console.error('Error retrieving the token from AsyncStorage:', error);
-    }
-  };
-
- 
-
-
-
-  useEffect(() => {
-    console.log('App component mounted');
-
-    verifyTokenInAsyncStorage();
-  }, [token]);
-
-  console.log('isSignedIn deuxième verif:', isSignedIn);
+    useEffect(() => {
+      const onStateChange = async () => {
+        await verifyToken();
+      };
+  
+      // Appelée à chaque changement d'état de la navigation
+      // Pas besoin d'ajouter ou de retirer manuellement des écouteurs
+      onStateChange();
+    }, [verifyToken]);
 
   return (
-    <NavigationContainer>
-      <Drawer.Navigator>
+    <NavigationContainer
+      onStateChange={async () => {
+        // Appelée à chaque changement d'état de la navigation
+        await verifyToken();
+      }}
+    >
+    <Drawer.Navigator>
         {isSignedIn ? (
           <>
             {/* Écrans pour les utilisateurs connectés */}
@@ -88,3 +70,5 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+export default App;
