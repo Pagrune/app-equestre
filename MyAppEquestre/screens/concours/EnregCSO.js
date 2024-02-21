@@ -1,177 +1,117 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, Platform, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
 import axios from 'react-native-axios';
 
-
 import bgImage from '../../img/fleur_background.png';
 
 const EnregCSO = ({ navigation }) => {
-    const [date, setDate] = useState(new Date());
-    const [show, setShow] = useState(false);
-    const [selectedValue, setSelectedValue] = useState("select");
+  const [date, setDate] = useState(new Date());
+  const [show, setShow] = useState(false);
+  const [categorie, setCategorie] = useState('');
+  const [catname, setCatname] = useState('');
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([]);
+  const [openNiveau, setOpenNiveau] = useState(false);
+  const [valueNiveau, setValueNiveau] = useState(null);
+  const [itemsNiveau, setItemsNiveau] = useState([]);
 
-    // Mise à jour de la catégorie sélectionnée
-    const [categorie, setCategorie] = useState("");
+  useEffect(() => {
+    axios.get('http://10.0.2.2:3000/cat/categories')
+      .then(response => {
+        const updatedItems = response.data.map(cat => ({
+          label: cat.categorie_name,
+          value: cat.categorie_id.toString()
+        }));
+        setItems(updatedItems);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, []);
 
-    useEffect(() => {
-        console.log("Catégorie sélectionnée mise à jour :", categorie);
-      }, [categorie]);
-      
-
-    const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(null);
-    const [items, setItems] = useState([]);
-
-    useEffect(() => {
-        // Récupération des catégories depuis le serveur
-        axios.get('http://10.0.2.2:3000/cat/categories')
-            .then(response => {
-                // Conversion de la structure des données reçues pour qu'elles correspondent
-                // à ce qui est attendu par DropDownPicker : [{label: 'Label', value: 'value'}, ...]
-                const updatedItems = response.data.map(cat => ({
-                    label: cat.categorie_name, // Utilisez cat.categorie_name ici
-                    value: cat.categorie_id.toString() // Convertit categorie_id en chaîne pour la value
-                }));
-                setItems(updatedItems);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    }, []);
-
-    //Récupération des niveaux depuis le serveur
-    useEffect(() => {
-        if (categorie) {
-            axios.get('http://10.0.2.2:3000/cat/niveau')
-            .then(response => {
-            
-            });
-        }
-    }, []);
-
-    const [openNiveau, setOpenNiveau] = useState(false);
-    const [valueNiveau, setValueNiveau] = useState(null);
-    const [itemsNiveau, setItemsNiveau] = useState([
-        {label: '4', value: '4'},
-        {label: '3', value: '3'},
-        {label: '2', value: '2'},
-        {label: '1', value: '1'},
-        {label: 'Elite', value: 'elite'}
-        // Ajoutez d'autres niveaux ici
-    ]);
-    
+  useEffect(() => {
+    if (categorie) {
+        axios.get(`http://10.0.2.2:3000/cat/niveau?categorie_id=${categorie}`)
+        .then(response => {
+            const updatedItemsNiveau = response.data.map(niv => ({
+                label: `${catname} ${niv.niveau_name}`, // Préfixez chaque label de niveau avec catname
+                value: niv.niveau_id.toString()
+            }));
+            setItemsNiveau(updatedItemsNiveau);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
+}, [categorie, catname]); // Ajoutez catname comme dépendance pour recalculer les items lorsque catname change
 
 
-    const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date;
-        setShow(Platform.OS === 'ios');
-        setDate(currentDate);
-    };
+  const onChange = (event, selectedDate) => {
+    setShow(Platform.OS === 'ios');
+    setDate(selectedDate || date);
+  };
 
-    const showDatepicker = () => {
-        setShow(true);
-    };
+  console.log('catname', catname);
 
-    return (
-        <ImageBackground source={bgImage} resizeMode="cover" style={styles.imageBackground}>
-        <View style={styles.container}>
-            <View style={styles.colorbg}>
-                {/* <Text style={styles.title}>Enregistrez votre concours de CSO</Text>
-                <View>
-                    <View >
-                        <Text>Lieu</Text>
-                        <TextInput
-                            placeholder="Lieu du concours"
-                            style={styles.input}
-                        />
-                    </View>
-                    {/* <Button title="Choisir une date" onPress={showDatepicker} />
-                    {show && (
-                        <DateTimePicker
-                            value={date}
-                            mode="date"
-                            display="default"
-                            onChange={onChange}
-                        />
-                    )} */}
-                    {/* <Text>Date</Text>
-                    <View style={styles.flex}>
-                        <TextInput
-                            placeholder="JJ"
-                            style={styles.input}
-                        />
-                        <TextInput
-                            placeholder="MM"
-                            style={styles.input}
-                        />
-                        <TextInput
-                            placeholder="AAAA"
-                            style={styles.input}
-                        />
-                    </View>
-                    <Text>Choisir ma catégorie d'épreuve</Text>
-                   
-                    <DropDownPicker
-                        open={open}
-                        value={value}
-                        items={items}
-                        setOpen={setOpen}
-                        setValue={setValue}
-                        setItems={setItems}
-                        style={styles.dropdownPicker} // Styles pour le conteneur
-                        dropDownContainerStyle={styles.dropdownContainer} // Styles pour le conteneur déroulant
-                        labelStyle={{
-                            color: '#EDDCD4', // Définissez la couleur du texte ici
-                            // Vous pouvez ajouter d'autres styles de texte ici, par exemple :
-                            // fontSize: 16,
-                            fontWeight: 'bold',
-                          }}
-                        onChangeValue={(value) => {
-                            // console.log("Valeur sélectionnée :", value);
-                            setCategorie(value);
-                        }}
-                    />
-                    {
-                    categorie && (
-                        <View>
-                        <Text>Choisir le niveau</Text>
-                        <DropDownPicker
-                            open={openNiveau}
-                            value={valueNiveau}
-                            items={itemsNiveau.map(item => ({
-                            label: value ? `${value} ${item.label}` : item.label,
-                            value: item.value
-                            }))}
-                            setOpen={setOpenNiveau}
-                            setValue={setValueNiveau}
-                            setItems={setItemsNiveau}
-                            style={styles.dropdownPicker2}
-                            dropDownContainerStyle={styles.dropdownContainer1}
-                            labelStyle={{
-                            color: '#EDDCD4',
-                            fontWeight: 'bold',
-                            // Autres styles de texte ici
-                            }}
-                            zIndex={1}
-                            zIndexInverse={6000}
-                        />
-                        </View>
-                    )
-                    }
+  return (
+    <ImageBackground source={bgImage} resizeMode="cover" style={styles.imageBackground}>
+      <View style={styles.container}>
+        <View style={styles.colorbg}>
+          <Text style={styles.title}>Enregistrez votre concours de CSO</Text>
+          <TextInput placeholder="Lieu du concours" style={styles.input} />
 
-                </View>
-                <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('Choix Discipline')}
-                >
-                    <Text style={styles.buttonText}>Enregistrer</Text>
-                </TouchableOpacity> */}
-                </View>
+          <TouchableOpacity onPress={() => setShow(true)} style={styles.btndate}>
+            <Text style={styles.btndateText}>Choisir une date</Text>
+          </TouchableOpacity>
+          {show && (
+            <DateTimePicker value={date} mode="date" display="default" onChange={onChange} />
+          )}
+
+          <Text>Choisir ma catégorie d'épreuve</Text>
+          <DropDownPicker
+            open={open}
+            value={value}
+            items={items}
+            setOpen={setOpen}
+            setValue={setValue}
+            setItems={setItems}
+            style={styles.dropdownPicker}
+            dropDownContainerStyle={styles.dropdownContainer}
+            labelStyle={styles.labelStyle}
+            zIndex={9000}
+            onChangeValue={(value) => {
+              setCategorie(value);
+              const selectedItem = items.find(item => item.value === value);
+              setCatname(selectedItem ? selectedItem.label : '');
+            }}
+          />
+          {categorie && (
+            <View>
+              <Text>Choisir le niveau</Text>
+              <DropDownPicker
+                open={openNiveau}
+                value={valueNiveau}
+                items={itemsNiveau}
+                setOpen={setOpenNiveau}
+                setValue={setValueNiveau}
+                setItems={setItemsNiveau}
+                style={styles.dropdownPicker2}
+                dropDownContainerStyle={styles.dropdownContainer1}
+                labelStyle={styles.labelStyle}
+                zIndex={6000}
+              />
             </View>
-            </ImageBackground>
-    );
+          )}
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Choix Discipline')}>
+            <Text style={styles.buttonText}>Enregistrer</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ImageBackground>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -186,12 +126,15 @@ const styles = StyleSheet.create({
     },
     colorbg: {
         backgroundColor: 'rgba(166, 134, 119, 0.8)',
-        // padding: 20,
-        // borderRadius: 10,
+        padding: 20,
+        borderRadius: 10,
     },
     title: {
         fontSize: 20,
         marginBottom: 20,
+        color: '#EDDCD4',
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 
     connexdiv: {
@@ -204,27 +147,38 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         borderWidth: 1,
         borderColor: 'gray',
-        borderRadius: 5,
+        borderRadius: 10,
         padding: 10,
-        backgroundColor: '#EDDCD4',
+        backgroundColor: 'white',
         color: '#A68677',
       },
       button: {
-        backgroundColor: '#EDDCD4', // Couleur de fond du bouton
-        padding: 10, // Ajoutez du padding selon votre design
-        borderRadius: 10, // Arrondir les coins du bouton
-        alignItems: 'center', // Centrer le texte du bouton
-        marginVertical: 5, // Espacement vertical entre les boutons
+        backgroundColor: '#C38D6B', 
+        padding: 10, 
+        borderRadius: 10, 
+        alignItems: 'center', 
+        marginVertical: 5,
+        width: 250,
+        alignSelf: 'center', 
+      },
+      btndate: {
+        backgroundColor: '#EDDCD4', 
+        padding: 10, 
+        borderRadius: 10, 
+        alignItems: 'center',
+        marginVertical: 5,
+        width: 250,
+        alignSelf: 'center',
       },
       dropdownPicker: {
         // Personnalisation du sélecteur
-        backgroundColor: '#A68677', 
+        backgroundColor: '#EDDCD4', 
         zIndex: 9000, 
        
       },
       dropdownPicker2: {
         // Personnalisation du sélecteur
-        backgroundColor: '#A68677', 
+        backgroundColor: '#EDDCD4', 
         zIndex: 6000, 
        
       },
