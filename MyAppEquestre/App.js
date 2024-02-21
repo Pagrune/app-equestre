@@ -1,13 +1,14 @@
 import 'react-native-gesture-handler';
 import React, { useState, useEffect , useContext} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerItem } from '@react-navigation/drawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // Importez vos écrans ici...
 import SignIn from './screens/auth/SignIn';
 import Home from './screens/Home';
 import HomeConnect from './screens/HomeConnect';
 import Register from './screens/auth/Register';
+import Logout from './screens/auth/Logout';
 import Compte from './screens/compte/Compte';
 import ChoixDiscipline from './screens/concours/ChoixDiscipline';
 import EnregCSO from './screens/concours/EnregCSO';
@@ -55,6 +56,7 @@ function AppContent() {
             <Drawer.Screen name="Choix Discipline" component={ChoixDiscipline} />
             <Drawer.Screen name="EnregCSO" component={EnregCSO} />
             <Drawer.Screen name="Compte" component={Compte} />
+            <Drawer.Screen name="Déconnexion" component={Logout} />
             {/* Ajoutez d'autres écrans ici si nécessaire */}
           </>
         ) : (

@@ -35,8 +35,13 @@ export const AuthProvider = ({ children }) => {
     verifyToken();
   }, []);
 
+  const logout = async () => {
+    await AsyncStorage.removeItem('userToken'); // Efface le token
+    setIsSignedIn(false); // Met à jour l'état pour indiquer que l'utilisateur est déconnecté
+  };
+
   return (
-    <AuthContext.Provider value={{ isSignedIn, verifyToken }}>
+    <AuthContext.Provider value={{ isSignedIn, verifyToken, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -21,9 +21,9 @@ const HomeConnect = ({ navigation }) => {
 
                 <TouchableOpacity
                   style={styles.button}
-                 
+                 onPress={() => navigation.jumpTo('Compte')}
                 >
-                  <Text style={styles.buttonText}>S'inscrire</Text>
+                  <Text style={styles.buttonText}>Mon Compte</Text>
                 </TouchableOpacity>
               </View>
             </View>
