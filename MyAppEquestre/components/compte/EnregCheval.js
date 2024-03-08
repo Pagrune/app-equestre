@@ -1,30 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, Image, TextInput , ImageBackground } from 'react-native';
 import axios from 'react-native-axios';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EnregCheval = ({ navigation }) => {
+    const [nomcheval, setNomCheval] = useState('');
 
-    useEffect(() => {
-    }, []);
+    const handleCheval = async () => {
+        if (nomcheval.trim() === '') {
+            Alert.alert('Attention', 'Veuillez remplir tous les champs');
+            return;
+        } else {
+            try {
+                // Récupérer le token depuis l'AsyncStorage
+                const token = await AsyncStorage.getItem('userToken');
+                const response = await axios.post('http://10.0.2.2:3000/infoscompte/cheval', {
+                    nomcheval,
+                    token
+                });
+                // Gérer la réponse ici, par exemple en naviguant vers un autre écran ou en affichant un message de succès
+                Alert.alert('Succès', 'Cheval enregistré avec succès');
+            } catch (error) {
+                console.error(error);
+                Alert.alert('Erreur', 'Un problème est survenu lors de l\'enregistrement du cheval');
+            }
+        }
+    };
 
     return (
         <View>
-            
-                <View >
+            <View>
                 <Text style={styles.title}>Ajouter un cheval</Text>
                 <TextInput
                     placeholder="Nom du cheval"
                     style={styles.input}
+                    onChangeText={setNomCheval} // Utilisez onChangeText pour mettre à jour l'état
                 />
-                <TextInput
-                    placeholder="Age du cheval"
-                    style={styles.input}
+                <Button
+                    title="Enregistrer mon cheval"
+                    onPress={handleCheval}
                 />
-
-                
-                </View>
-
+            </View>
         </View>
     );
 }

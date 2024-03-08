@@ -34,4 +34,36 @@ router.post('/cavalier', (req, res) => {
   });
 });
 
+router.post('/cheval', async (req, res) => {
+  const { nomcheval, token } = req.body;
+
+  try {
+    // Vérifier si le token est valide
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decodedToken.id;
+
+    // Première requête pour insérer le cheval
+    const insertChevalQuery = 'INSERT INTO cheval (cheval_name) VALUES (?)';
+    const [chevalResult] = await pool.promise().query(insertChevalQuery, [nomcheval]);
+
+    if (chevalResult.affectedRows === 0) {
+      return res.status(404).send('Erreur lors de l\'insertion du cheval');
+    }
+
+    // Deuxième requête pour lier le cheval à l'utilisateur
+    const chevalId = chevalResult.insertId; // Récupérer l'ID du cheval inséré
+    const insertProprieteQuery = 'INSERT INTO propriete (id_user, cheval_id) VALUES (?, ?)';
+    await pool.promise().query(insertProprieteQuery, [userId, chevalId]);
+
+    res.status(200).send('Cheval lié à l\'utilisateur avec succès');
+  } catch (error) {
+    console.error(error);
+    if (error.name === 'JsonWebTokenError') {
+      res.status(401).send('Token invalide');
+    } else {
+      res.status(500).send('Erreur du serveur');
+    }
+  }
+});
+
 module.exports = router;
