@@ -25,6 +25,8 @@ app.use('/saut', require('./router/sautRouter.js'));
 
 app.use('/cat', require('./router/catRouter.js'));
 
+app.use('/infoscompte', require('./router/authInfosCompte.js'));
+
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 
