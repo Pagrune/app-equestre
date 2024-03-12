@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import bgImage from '../../img/fleur_background.png';
 
 
-const EnregCSO = ({ navigation }) => {
+const EnregCCE = ({ navigation }) => {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [categorie, setCategorie] = useState(null); // Use null for initial state when dealing with objects or arrays
@@ -33,12 +33,6 @@ const EnregCSO = ({ navigation }) => {
 
   const dateEpreuve = `${annee}-${mois}-${jour}`;
 
-  // console.log('date' + dateEpreuve);
-  // console.log('categorie' + categorie);
-  // console.log('niveau' + valueNiveau);
-  // console.log('classement' + classement);
-  // console.log('participant' + participant);
-  // console.log('cheval' + selectedCheval);
 
   useFocusEffect(
     useCallback(() => {
@@ -101,7 +95,7 @@ const EnregCSO = ({ navigation }) => {
     const token = await AsyncStorage.getItem('userToken');
     const dateEpreuve = `${annee}-${mois}-${jour}`;
     try {
-      const response = await axios.post('http://10.0.2.2:3000/enreg/saut', {
+      const response = await axios.post('http://10.0.2.2:3000/enreg/cce', {
         token,
         concours_date: dateEpreuve,
         categorie_id: categorie,
@@ -133,8 +127,8 @@ const EnregCSO = ({ navigation }) => {
     <ImageBackground source={bgImage} resizeMode="cover" style={styles.imageBackground}>
       <View style={styles.container}>
         <View style={styles.colorbg}>
-          <Text style={styles.title}>Enregistrez votre concours de CSO</Text>
-          <TextInput placeholder="Lieu du concours" style={styles.input} onChange={setLieu}/>
+          <Text style={styles.title}>Enregistrez votre concours complet</Text>
+          <TextInput placeholder="Lieu du concours" style={styles.input} onChangeText={setLieu}/>
 
           <Text>Choisir mon cheval</Text>
           <DropDownPicker
@@ -152,16 +146,6 @@ const EnregCSO = ({ navigation }) => {
               setSelectedCheval(value);
             }}
           />
-          
-
-
-
-          {/* <TouchableOpacity onPress={() => setShow(true)} style={styles.btndate}>
-            <Text style={styles.btndateText}>Choisir une date</Text>
-          </TouchableOpacity>
-          {show && (
-            <DateTimePicker value={date} mode="date" display="default" onChange={onChange} />
-          )} */}
 
           <Text>Choisir la date de l'épreuve</Text>
           <View style={styles.flex}>
@@ -330,4 +314,4 @@ const styles = StyleSheet.create({
     // Assurez-vous d'inclure la définition pour styles.input ici si elle est utilisée
 });
 
-export default EnregCSO;
+export default EnregCCE;

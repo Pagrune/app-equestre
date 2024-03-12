@@ -13,7 +13,7 @@ const ChoixDiscipline = ({ navigation }) => {
             <ImageBackground source={bgImage} resizeMode="cover" style={styles.imagebg}>
                 <View style={styles.container}>
                     <Text style={styles.title}>Choisissez une discipline</Text>
-                    <TouchableOpacity style={styles.discipline} onPress={() => navigation.navigate('Dressage')}>
+                    <TouchableOpacity style={styles.discipline} onPress={() => navigation.navigate('EnregDressage')}>
                         <Image source={imgDressage} style={styles.image} />
                         <Text>Dressage</Text>
                     </TouchableOpacity>
@@ -21,7 +21,7 @@ const ChoixDiscipline = ({ navigation }) => {
                         <Image source={imgCSO} style={styles.image} />
                         <Text>CSO</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.discipline} onPress={() => navigation.navigate('CCE')}>
+                    <TouchableOpacity style={styles.discipline} onPress={() => navigation.navigate('EnregCCE')}>
                         <Image source={imgCCE} style={styles.image} />
                         <Text>CCE</Text>
                     </TouchableOpacity>

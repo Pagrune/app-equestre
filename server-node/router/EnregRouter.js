@@ -104,7 +104,7 @@ router.post('/chevaux', async (req, res) => {
 });
 
 router.post('/saut', async (req, res) => {
-  const { token, concours_date, categorie_id, niveau_id, classement, participant, selectedCheval } = req.body;
+  const { token, concours_date, categorie_id, niveau_id, classement, participant, selectedCheval, lieu } = req.body;
 
   // Vérifier si le token est valide
   try{
@@ -126,8 +126,8 @@ router.post('/saut', async (req, res) => {
             const propriete_id = results[0].propriete_id;
             console.log(propriete_id);
             // Utilisation d'une requête INSERT pour insérer un nouvel enregistrement
-            const query = 'INSERT INTO concours (propriete_id, concours_date, categorie_id, niveau_id, concours_classement, concours_participant, discipline_id	) VALUES (?, ?, ?, ?, ?, ?, ?)';
-            pool.query(query, [propriete_id, concours_date, categorie_id, niveau_id, classement, participant, discipline_id], (error, results) => {
+            const query = 'INSERT INTO concours (propriete_id, concours_date, concours_lieu, categorie_id, niveau_id, concours_classement, concours_participant, discipline_id	) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+            pool.query(query, [propriete_id, concours_date, lieu, categorie_id, niveau_id, classement, participant, discipline_id], (error, results) => {
               if (error) {
                 console.error(error);
                 res.status(500).send('Erreur du serveur');
@@ -137,16 +137,96 @@ router.post('/saut', async (req, res) => {
             });
           }
         });
-        // Utilisation d'une requête INSERT pour insérer un nouvel enregistrement
-        // const query = 'INSERT INTO concours (propriete_id, concours_date, categorie_id, niveau_id, concours_classement, concours_participant, discipline_id	) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        // pool.query(query, [cheval_id, concours_date, categorie_id, niveau_id, classement, participant], (error, results) => {
-        //   if (error) {
-        //     console.error(error);
-        //     res.status(500).send('Erreur du serveur');
-        //   } else {
-        //     res.status(201).send('Enregistrement réussi');
-        //   }
-        // });
+      }
+    });
+  }
+  catch{
+    res.status(401).send('Token invalide');
+  
+  }
+
+}
+);
+
+router.post('/dressage', async (req, res) => {
+  const { token, concours_date, categorie_id, niveau_id, classement, participant, selectedCheval, lieu } = req.body;
+
+  // Vérifier si le token est valide
+  try{
+    jwt.verify(token, process.env.JWT_SECRET, (error, decodedToken) => {
+      if (error) {
+        console.error(error);
+        res.status(401).send('Token invalide');
+      } else {
+        // decode the token
+        const userId = decodedToken.id;
+        const discipline_id = "1";
+
+        const propriete_id_query = 'SELECT propriete_id FROM propriete WHERE id_user = ? AND cheval_id = ?';
+        pool.query(propriete_id_query, [userId, selectedCheval], (error, results) => {
+          if (error) {
+            console.error(error);
+            res.status(500).send('Erreur du serveur');
+          } else {
+            const propriete_id = results[0].propriete_id;
+            console.log(propriete_id);
+            // Utilisation d'une requête INSERT pour insérer un nouvel enregistrement
+            const query = 'INSERT INTO concours (propriete_id, concours_date, concours_lieu, categorie_id, niveau_id, concours_classement, concours_participant, discipline_id	) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+            pool.query(query, [propriete_id, concours_date, lieu, categorie_id, niveau_id, classement, participant, discipline_id], (error, results) => {
+              if (error) {
+                console.error(error);
+                res.status(500).send('Erreur du serveur');
+              } else {
+                res.status(201).send('Enregistrement réussi');
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+  catch{
+    res.status(401).send('Token invalide');
+  
+  }
+
+}
+);
+
+router.post('/cce', async (req, res) => {
+  const { token, concours_date, categorie_id, niveau_id, classement, participant, selectedCheval, lieu } = req.body;
+
+  // Vérifier si le token est valide
+  try{
+    jwt.verify(token, process.env.JWT_SECRET, (error, decodedToken) => {
+      if (error) {
+        console.error(error);
+        res.status(401).send('Token invalide');
+      } else {
+        // decode the token
+        const userId = decodedToken.id;
+        const discipline_id = "3";
+
+        const propriete_id_query = 'SELECT propriete_id FROM propriete WHERE id_user = ? AND cheval_id = ?';
+        pool.query(propriete_id_query, [userId, selectedCheval], (error, results) => {
+          if (error) {
+            console.error(error);
+            res.status(500).send('Erreur du serveur');
+          } else {
+            const propriete_id = results[0].propriete_id;
+            console.log(propriete_id);
+            // Utilisation d'une requête INSERT pour insérer un nouvel enregistrement
+            const query = 'INSERT INTO concours (propriete_id, concours_date, concours_lieu, categorie_id, niveau_id, concours_classement, concours_participant, discipline_id	) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+            pool.query(query, [propriete_id, concours_date, lieu, categorie_id, niveau_id, classement, participant, discipline_id], (error, results) => {
+              if (error) {
+                console.error(error);
+                res.status(500).send('Erreur du serveur');
+              } else {
+                res.status(201).send('Enregistrement réussi');
+              }
+            });
+          }
+        });
       }
     });
   }
