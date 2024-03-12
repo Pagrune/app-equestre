@@ -1,22 +1,66 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
+import React, { useState, useEffect, useCallback  } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ImageBackground, FlatList } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
 import axios from 'react-native-axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import bgImage from '../../img/fleur_background.png';
+
 
 const EnregCSO = ({ navigation }) => {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
-  const [categorie, setCategorie] = useState('');
+  const [categorie, setCategorie] = useState(null); // Use null for initial state when dealing with objects or arrays
   const [catname, setCatname] = useState('');
   const [open, setOpen] = useState(false);
+  const [ouvert, setOuvert] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([]);
   const [openNiveau, setOpenNiveau] = useState(false);
   const [valueNiveau, setValueNiveau] = useState(null);
   const [itemsNiveau, setItemsNiveau] = useState([]);
+  const [chevaux, setChevaux] = useState([]);
+  const [selectedCheval, setSelectedCheval] = useState(null);
+
+
+  const [jour, setJour] = useState('');
+  const [mois, setMois] = useState('');
+  const [annee, setAnnee] = useState('');
+  const [classement, setClassement] = useState('');
+  const [participant, setParticipant] = useState('');
+
+  const dateEpreuve = `${annee}-${mois}-${jour}`;
+
+  // console.log('date' + dateEpreuve);
+  // console.log('categorie' + categorie);
+  // console.log('niveau' + valueNiveau);
+  // console.log('classement' + classement);
+  // console.log('participant' + participant);
+  // console.log('cheval' + selectedCheval);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchChevaux = async () => {
+        const token = await AsyncStorage.getItem('userToken');
+        try {
+          const response = await axios.post('http://10.0.2.2:3000/infoscompte/propriete', { token });
+          console.log('Chevaux:', response.data);
+          // Ajustement ici : Mise à jour de la structure de l'array pour DropDownPicker
+          const chevauxFormatted = response.data.map(cheval => ({
+            label: cheval.cheval_name,
+            value: cheval.cheval_id, // Supposant que chaque cheval a un identifiant unique `cheval_id`
+          }));
+          setChevaux(chevauxFormatted);
+          // console.log('Chevaux formatted:', chevauxFormatted);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchChevaux();
+    }, [])
+  );
 
   useEffect(() => {
     axios.get('http://10.0.2.2:3000/cat/categories')
@@ -34,27 +78,44 @@ const EnregCSO = ({ navigation }) => {
 
   useEffect(() => {
     if (categorie) {
-        axios.get(`http://10.0.2.2:3000/cat/niveau?categorie_id=${categorie}`)
+      axios.get(`http://10.0.2.2:3000/cat/niveau?categorie_id=${categorie}`)
         .then(response => {
-            const updatedItemsNiveau = response.data.map(niv => ({
-                label: `${catname} ${niv.niveau_name}`, // Préfixez chaque label de niveau avec catname
-                value: niv.niveau_id.toString()
-            }));
-            setItemsNiveau(updatedItemsNiveau);
+          const updatedItemsNiveau = response.data.map(niv => ({
+            label: `${catname} ${niv.niveau_name}`, // Prefix each level label with catname
+            value: niv.niveau_id.toString()
+          }));
+          setItemsNiveau(updatedItemsNiveau);
         })
         .catch(error => {
-            console.error(error);
+          console.error(error);
         });
     }
-}, [categorie, catname]); // Ajoutez catname comme dépendance pour recalculer les items lorsque catname change
-
+  }, [categorie, catname]); // Add catname as a dependency to recalculate items when catname changes
 
   const onChange = (event, selectedDate) => {
     setShow(Platform.OS === 'ios');
-    setDate(selectedDate || date);
+    setDate(selectedDate || date); // Use selectedDate or current date if selectedDate is undefined
   };
 
-  console.log('catname', catname);
+  const handleCSO = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    const dateEpreuve = `${annee}-${mois}-${jour}`;
+    try {
+      const response = await axios.post('http://10.0.2.2:3000/enreg/saut', {
+        token,
+        concours_date: dateEpreuve,
+        categorie_id: categorie,
+        niveau_id: valueNiveau,
+        classement,
+        participant,
+        selectedCheval
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 
   return (
     <ImageBackground source={bgImage} resizeMode="cover" style={styles.imageBackground}>
@@ -63,12 +124,59 @@ const EnregCSO = ({ navigation }) => {
           <Text style={styles.title}>Enregistrez votre concours de CSO</Text>
           <TextInput placeholder="Lieu du concours" style={styles.input} />
 
-          <TouchableOpacity onPress={() => setShow(true)} style={styles.btndate}>
+          <Text>Choisir mon cheval</Text>
+          <DropDownPicker
+            open={ouvert}
+            value={selectedCheval} // Utilisation de l'état spécifique pour ce DropDown
+            items={chevaux}
+            setOpen={setOuvert}
+            setValue={setSelectedCheval} // Mise à jour avec la fonction spécifique
+            setItems={setChevaux}
+            style={styles.dropdownPicker}
+            dropDownContainerStyle={styles.dropdownContainer}
+            labelStyle={styles.labelStyle}
+            zIndex={3000}
+            onChangeValue={(value) => {
+              setSelectedCheval(value);
+            }}
+          />
+          
+
+
+
+          {/* <TouchableOpacity onPress={() => setShow(true)} style={styles.btndate}>
             <Text style={styles.btndateText}>Choisir une date</Text>
           </TouchableOpacity>
           {show && (
             <DateTimePicker value={date} mode="date" display="default" onChange={onChange} />
-          )}
+          )} */}
+
+          <Text>Choisir la date de l'épreuve</Text>
+          <View style={styles.flex}>
+            <TextInput 
+              placeholder="JJ" 
+              style={styles.input} 
+              keyboardType="numeric" // Seuls des chiffres peuvent être entrés
+              maxLength={2} // Limiter la saisie à 2 chiffres pour le jour
+              onChangeText={setJour}
+            />
+            <TextInput 
+              placeholder="MM" 
+              style={styles.input} 
+              keyboardType="numeric" // Seuls des chiffres peuvent être entrés
+              maxLength={2} // Limiter la saisie à 2 chiffres pour le mois
+              onChangeText={setMois}
+            />
+            <TextInput 
+              placeholder="AAAA" 
+              style={styles.input} 
+              keyboardType="numeric" // Seuls des chiffres peuvent être entrés
+              maxLength={4} // Limiter la saisie à 4 chiffres pour l'année
+              onChangeText={setAnnee}
+            />
+          </View>
+
+          
 
           <Text>Choisir ma catégorie d'épreuve</Text>
           <DropDownPicker
@@ -105,7 +213,14 @@ const EnregCSO = ({ navigation }) => {
               />
             </View>
           )}
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Choix Discipline')}>
+
+          <Text>Mon classement</Text>
+          <View style={styles.flex}>
+            <TextInput placeholder="4" style={styles.input} keyboardType="numeric" onChangeText={setClassement} />
+            <Text>/</Text>
+            <TextInput placeholder="47" style={styles.input} keyboardType="numeric" onChangeText={setParticipant}/>
+          </View>
+          <TouchableOpacity style={styles.button} onPress={handleCSO}>
             <Text style={styles.buttonText}>Enregistrer</Text>
           </TouchableOpacity>
         </View>

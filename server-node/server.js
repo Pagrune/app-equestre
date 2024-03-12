@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 
 app.use('/auth', authRouter);
 
-app.use('/saut', require('./router/sautRouter.js'));
+app.use('/enreg', require('./router/EnregRouter.js'));
 
 app.use('/cat', require('./router/catRouter.js'));
 
