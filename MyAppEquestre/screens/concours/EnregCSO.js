@@ -111,6 +111,17 @@ const EnregCSO = ({ navigation }) => {
         selectedCheval
       });
       console.log(response.data);
+      setDate(new Date());
+      setCategorie(null);
+      setCatname('');
+      setValue(null); // Assurez-vous de réinitialiser les valeurs de DropDownPicker correctement
+      setItemsNiveau([]);
+      setSelectedCheval(null);
+      setJour('');
+      setMois('');
+      setAnnee('');
+      setClassement('');
+      setParticipant('');
     } catch (error) {
       console.error(error);
     }
