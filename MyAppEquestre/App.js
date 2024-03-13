@@ -10,10 +10,13 @@ import HomeConnect from './screens/HomeConnect';
 import Register from './screens/auth/Register';
 import Logout from './screens/auth/Logout';
 import Compte from './screens/compte/Compte';
+
 import ChoixDiscipline from './screens/concours/ChoixDiscipline';
 import EnregCSO from './screens/concours/EnregCSO';
 import EnregDressage from './screens/concours/EnregDressage';
 import EnregCCE from './screens/concours/EnregCCE';
+
+import Resultat from './screens/concours/Resultat';
 // Autres importations...
 import base64 from 'react-native-base64'
 
@@ -60,6 +63,7 @@ function AppContent() {
             <Drawer.Screen name="EnregDressage" component={EnregDressage} />
             <Drawer.Screen name="EnregCCE" component={EnregCCE} />
             <Drawer.Screen name="Compte" component={Compte} />
+            <Drawer.Screen name="Resultat" component={Resultat} />
             <Drawer.Screen name="Déconnexion" component={Logout} />
             {/* Ajoutez d'autres écrans ici si nécessaire */}
           </>

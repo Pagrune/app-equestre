@@ -29,4 +29,15 @@ router.get('/niveau', (req, res) => {
     );
 });
 
+router.get('/discipline', (req, res) => {
+    pool.query('SELECT * FROM discipline', (error, results) => {
+        if (error) {
+        console.error(error);
+        res.status(500).send('Erreur du serveur');
+        } else {
+        res.status(200).json(results);
+        }
+    });
+});
+
 module.exports = router;

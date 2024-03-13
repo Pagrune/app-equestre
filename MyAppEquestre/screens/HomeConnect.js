@@ -21,6 +21,13 @@ const HomeConnect = ({ navigation }) => {
 
                 <TouchableOpacity
                   style={styles.button}
+                 onPress={() => navigation.jumpTo('Resultat')}
+                >
+                  <Text style={styles.buttonText}>Mes Résultats</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.button}
                  onPress={() => navigation.jumpTo('Compte')}
                 >
                   <Text style={styles.buttonText}>Mon Compte</Text>
