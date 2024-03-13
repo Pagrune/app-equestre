@@ -17,12 +17,14 @@ import EnregDressage from './screens/concours/EnregDressage';
 import EnregCCE from './screens/concours/EnregCCE';
 
 import Resultat from './screens/concours/Resultat';
+import Chart from './screens/concours/Chart';
 // Autres importations...
 import base64 from 'react-native-base64'
 
 const Drawer = createDrawerNavigator();
 
 import { AuthProvider, useAuth } from './AuthProvider';
+
 
 
 function App() {
@@ -64,6 +66,7 @@ function AppContent() {
             <Drawer.Screen name="EnregCCE" component={EnregCCE} />
             <Drawer.Screen name="Compte" component={Compte} />
             <Drawer.Screen name="Resultat" component={Resultat} />
+            <Drawer.Screen name="Suivi graphique" component={Chart} />
             <Drawer.Screen name="Déconnexion" component={Logout} />
             {/* Ajoutez d'autres écrans ici si nécessaire */}
           </>

@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Dimensions  } from 'react-native';
 import axios from 'react-native-axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+    LineChart,
+  } from "react-native-chart-kit";
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+
+
 
 import bgImage from '../../img/fleur_background.png';
 
@@ -11,6 +15,78 @@ const Chart = ({ navigation }) => {
     const [resultats, setResultats] = useState([]);
     const [discipline, setDiscipline] = useState([]);
     const [selectedDiscipline, setSelectedDiscipline] = useState(null);
+    const [date, setDate] = useState([]);
+    const [quarts, setQuarts] = useState([]);
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return format(date, "dd-MM");
+    }
+
+    const [dateformated, setDateformated] = useState([]);
+        
+    useEffect(() => {
+        if (resultats && resultats.length > 0) {
+            const formattedDates = resultats.map(resultat => {
+                return formatDate(resultat.concours_date);
+            });
+            setDateformated(formattedDates);
+        }
+    }, [resultats]);  
+
+    console.log('liste date' + dateformated);
+
+    const quart = (classement, participant) => {
+        const pourcentage = (classement / participant) * 100;
+        if (pourcentage <= 25) {
+            return "1";
+        }
+        else if (pourcentage <= 50 && pourcentage > 25) {
+            return "2";
+        }
+        else if (pourcentage <= 75 && pourcentage > 50) {
+            return "3";
+        }
+        else {
+            return "4";
+        }
+    }
+
+    useEffect(() => {
+        if (resultats && resultats.length > 0) {
+            const quarts = resultats.map(resultat => {
+                return quart(resultat.concours_classement, resultat.concours_participant);
+            });
+            setQuarts(quarts);
+
+        }
+    }, [resultats]);
+
+    console.log('liste quart' + quarts);
+
+    const screenWidth = Dimensions.get("window").width;
+    const chartConfig = {
+        backgroundGradientFrom: "#A68677",
+        backgroundGradientFromOpacity: 0,
+        backgroundGradientTo: "#A68677",
+        backgroundGradientToOpacity: 0.5,
+        color: (opacity = 1) => `rgba(186, 120, 104, ${opacity})`,
+        strokeWidth: 2, // optional, default 3
+        barPercentage: 0.5,
+        useShadowColorFromDataset: false // optional
+      };
+
+    const data = {
+        labels: dateformated,
+        datasets: [
+          {
+            data: quarts,
+            color: (opacity = 1) => `rgba(195, 141, 107, ${opacity})`, // optional
+            strokeWidth: 2 // optional
+          }
+        ],
+        
+      };
 
     useEffect(() => {
         const fetchResultats = async () => {
@@ -27,7 +103,7 @@ const Chart = ({ navigation }) => {
 
         fetchResultats();
     }, []);
-    // console.log(resultats);
+    console.log(resultats);
 
     useEffect(() => {
         axios.get('http://10.0.2.2:3000/cat/discipline').then(response => {
@@ -42,13 +118,7 @@ const Chart = ({ navigation }) => {
         });
     }, []);
 
-      console.log("discipline" + discipline);
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        // Passer { locale: fr } comme troisième argument
-        return format(date, "d MMMM yyyy", { locale: fr });
-    }
+    //   console.log("discipline" + discipline);
 
     const handlefilter = (id) => {
         setSelectedDiscipline(id);
@@ -61,14 +131,20 @@ const Chart = ({ navigation }) => {
         <View style={styles.containerout}>
             <ImageBackground source={bgImage} resizeMode="cover" style={styles.imagebg}>
                 <View style={styles.container}>
-                    <Text style={styles.title}>Mes concours enregistrés</Text>  
+                    <Text style={styles.title}>Suivi des résultats</Text>  
                     <View style={styles.flex}>
                         {discipline.map((dis, index) => (
                             <TouchableOpacity key={index} onPress={() => handlefilter(dis.value)} style={styles.btn}>
                                 <Text style={styles.txt}>{dis.label}</Text>
                             </TouchableOpacity>
                         ))}
-                    </View>                 
+                    </View> 
+                    <LineChart
+                        data={data}
+                        width={screenWidth}
+                        height={220}
+                        chartConfig={chartConfig}
+                    />              
                     {/* <View>
                         {resultats.filter(resultat => selectedDiscipline === null || resultat.discipline_id.toString() === selectedDiscipline)
                                 .map((resultat, index) => (

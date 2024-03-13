@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import axios from 'react-native-axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { format } from 'date-fns';
@@ -60,6 +60,7 @@ const Resultat = ({ navigation }) => {
     return (
         <View style={styles.containerout}>
             <ImageBackground source={bgImage} resizeMode="cover" style={styles.imagebg}>
+            <ScrollView style={styles.scrollViewStyle}>
                 <View style={styles.container}>
                     <Text style={styles.title}>Mes concours enregistrés</Text>  
                     <View style={styles.flex}>
@@ -88,6 +89,7 @@ const Resultat = ({ navigation }) => {
                     </View>
 
                 </View>
+                </ScrollView>
             </ImageBackground>
         </View>
     );
@@ -98,6 +100,9 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    scrollViewStyle: {
+        width: '100%',
     },
     imagebg: {
         flex: 1,
