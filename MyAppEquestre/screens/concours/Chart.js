@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Dimensions  } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import axios from 'react-native-axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-    LineChart,
-  } from "react-native-chart-kit";
+import { LineChart } from 'react-native-chart-kit';
 import { format } from 'date-fns';
-
-
 
 import bgImage from '../../img/fleur_background.png';
 
@@ -15,156 +11,104 @@ const Chart = ({ navigation }) => {
     const [resultats, setResultats] = useState([]);
     const [discipline, setDiscipline] = useState([]);
     const [selectedDiscipline, setSelectedDiscipline] = useState(null);
-    const [date, setDate] = useState([]);
-    const [quarts, setQuarts] = useState([]);
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return format(date, "dd-MM");
-    }
-
-    const [dateformated, setDateformated] = useState([]);
-        
-    useEffect(() => {
-        if (resultats && resultats.length > 0) {
-            const formattedDates = resultats.map(resultat => {
-                return formatDate(resultat.concours_date);
-            });
-            setDateformated(formattedDates);
-        }
-    }, [resultats]);  
-
-    console.log('liste date' + dateformated);
-
-    const quart = (classement, participant) => {
-        const pourcentage = (classement / participant) * 100;
-        if (pourcentage <= 25) {
-            return "1";
-        }
-        else if (pourcentage <= 50 && pourcentage > 25) {
-            return "2";
-        }
-        else if (pourcentage <= 75 && pourcentage > 50) {
-            return "3";
-        }
-        else {
-            return "4";
-        }
-    }
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (resultats && resultats.length > 0) {
-            const quarts = resultats.map(resultat => {
-                return quart(resultat.concours_classement, resultat.concours_participant);
-            });
-            setQuarts(quarts);
-
-        }
-    }, [resultats]);
-
-    console.log('liste quart' + quarts);
-
-    const screenWidth = Dimensions.get("window").width;
-    const chartConfig = {
-        backgroundGradientFrom: "#A68677",
-        backgroundGradientFromOpacity: 0,
-        backgroundGradientTo: "#A68677",
-        backgroundGradientToOpacity: 0.5,
-        color: (opacity = 1) => `rgba(186, 120, 104, ${opacity})`,
-        strokeWidth: 2, // optional, default 3
-        barPercentage: 0.5,
-        useShadowColorFromDataset: false // optional
-      };
-
-    const data = {
-        labels: dateformated,
-        datasets: [
-          {
-            data: quarts,
-            color: (opacity = 1) => `rgba(195, 141, 107, ${opacity})`, // optional
-            strokeWidth: 2 // optional
-          }
-        ],
-        
-      };
-
-    useEffect(() => {
-        const fetchResultats = async () => {
+        const fetchData = async () => {
+            setIsLoading(true);
             try {
                 const token = await AsyncStorage.getItem('userToken');
-                // Assurez-vous d'envoyer le token si nécessaire pour votre endpoint
-                const response = await axios.post('http://10.0.2.2:3000/concours/showconcours', { token });
-                console.log(response.data);
-                setResultats(response.data);
+                const resResultats = await axios.post('http://10.0.2.2:3000/concours/showconcours', { token });
+                const resDiscipline = await axios.get('http://10.0.2.2:3000/cat/discipline');
+                setResultats(resResultats.data);
+                setDiscipline(resDiscipline.data.map(dis => ({
+                    label: dis.nom_discipline,
+                    value: dis.id_discipline.toString(),
+                })));
             } catch (error) {
-                console.error('Erreur lors de la récupération des concours :', error);
+                console.error('Erreur lors de la récupération des données:', error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
-        fetchResultats();
-    }, []);
-    console.log(resultats);
-
-    useEffect(() => {
-        axios.get('http://10.0.2.2:3000/cat/discipline').then(response => {
-            const discline = response.data.map(dis => ({
-                label: dis.nom_discipline,
-                value: dis.id_discipline.toString()
-            }));
-            setDiscipline(discline); 
-        })
-        .catch(error => {
-            console.error(error);
-        });
+        fetchData();
     }, []);
 
-    //   console.log("discipline" + discipline);
-
-    const handlefilter = (id) => {
+    const handleFilter = (id) => {
         setSelectedDiscipline(id);
-    }
-    
-      
+    };
 
+    if (isLoading) {
+        return (
+            <View style={styles.loaderContainer}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        );
+    }
+
+    // Calcul des quartiles
+    const calculateQuartiles = () => {
+        return resultats.map(resultat => {
+            const pourcentage = (resultat.concours_classement / resultat.concours_participant) * 100;
+            if (pourcentage <= 25) {
+                return 1;
+            } else if (pourcentage <= 50) {
+                return 2;
+            } else if (pourcentage <= 75) {
+                return 3;
+            } else {
+                return 4;
+            }
+        });
+    };
+
+    // Préparation des données pour le LineChart
+    const quarts = calculateQuartiles();
+    const datesFormatted = resultats.map(r => format(new Date(r.concours_date), 'dd-MM'));
+    const dataForChart = {
+        labels: datesFormatted,
+        datasets: [
+            {
+                data: quarts,
+                color: (opacity = 1) => `rgba(195, 141, 107, ${opacity})`,
+                strokeWidth: 2,
+            },
+        ],
+    };
+
+
+    const screenWidth = Dimensions.get('window').width;
+    const chartConfig = {
+        backgroundGradientFrom: '#A68677',
+        backgroundGradientTo: '#A68677',
+        decimalPlaces: 2,
+        color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+        labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+        style: {
+            borderRadius: 16,
+        },
+        propsForDots: {
+            r: '6',
+            strokeWidth: '2',
+            stroke: '#ffa726',
+        },
+    };
 
     return (
-        <View style={styles.containerout}>
+        <View style={styles.container}>
             <ImageBackground source={bgImage} resizeMode="cover" style={styles.imagebg}>
-                <View style={styles.container}>
-                    <Text style={styles.title}>Suivi des résultats</Text>  
-                    <View style={styles.flex}>
-                        {discipline.map((dis, index) => (
-                            <TouchableOpacity key={index} onPress={() => handlefilter(dis.value)} style={styles.btn}>
-                                <Text style={styles.txt}>{dis.label}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View> 
-                    <LineChart
-                        data={data}
-                        width={screenWidth}
-                        height={220}
-                        chartConfig={chartConfig}
-                    />              
-                    {/* <View>
-                        {resultats.filter(resultat => selectedDiscipline === null || resultat.discipline_id.toString() === selectedDiscipline)
-                                .map((resultat, index) => (
-                                    <View key={index} style={styles.resultatItem}>
-                                        <Text style={styles.h2}>{resultat.concours_lieu}</Text>
-                                        <View style={styles.flex}>
-                                            <Text style={styles.txt}>{resultat.concours_classement}</Text>
-                                            <Text style={styles.txt}>/</Text>
-                                            <Text style={styles.txt}>{resultat.concours_participant}</Text>
-                                        </View>
-                                        <Text style={styles.txt}>{formatDate(resultat.concours_date)}</Text>
-                                    </View>
-                                ))}
-                    </View> */}
-
-                </View>
+                <Text style={styles.title}>Suivi des résultats</Text>
+                <LineChart
+                    data={dataForChart}
+                    width={screenWidth}
+                    height={220}
+                    chartConfig={chartConfig}
+                />
             </ImageBackground>
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -175,47 +119,20 @@ const styles = StyleSheet.create({
     imagebg: {
         flex: 1,
         justifyContent: 'center',
+        alignItems: 'center',
         width: '100%',
-        height: '60%',
-    },
-    containerout: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        backgroundColor: '#EDDCD4',
-        position: 'relative',
+        height: '100%',
     },
     title: {
         fontSize: 24,
-        marginBottom: 20,
+        marginBottom: 10,
     },
-    btn: {
-        backgroundColor: '#A68677', // Couleur de fond du bouton
-        padding: 10, // Ajoutez du padding selon votre design
-        borderRadius: 10, // Arrondir les coins du bouton
-        alignItems: 'center', // Centrer le texte du bouton
-        marginVertical: 5, // Espacement vertical entre les boutons
-      },
-    resultatItem: {
-        backgroundColor: '#C38D6B',
-        padding: 10,
-        borderRadius: 10,
-        margin: 10,
-        color: 'white',
-    },
-    flex: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignSelf: 'stretch',
+    loaderContainer: {
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
-      },
-      h2: {
-        fontSize: 18,
-        color: 'white',
-      },
-      txt: {
-        color: 'white',
-      },
-    // ... autres styles
+    },
+    // Autres styles...
 });
 
 export default Chart;
