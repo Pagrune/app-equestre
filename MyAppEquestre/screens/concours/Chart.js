@@ -47,25 +47,20 @@ const Chart = ({ navigation }) => {
         );
     }
 
-    // Calcul des quartiles
+    const filteredResults = selectedDiscipline
+        ? resultats.filter(r => r.discipline_id.toString() === selectedDiscipline)
+        : resultats;
+
     const calculateQuartiles = () => {
-        return resultats.map(resultat => {
+        return filteredResults.map(resultat => {
             const pourcentage = (resultat.concours_classement / resultat.concours_participant) * 100;
-            if (pourcentage <= 25) {
-                return 1;
-            } else if (pourcentage <= 50) {
-                return 2;
-            } else if (pourcentage <= 75) {
-                return 3;
-            } else {
-                return 4;
-            }
+            return pourcentage <= 25 ? 1 : pourcentage <= 50 ? 2 : pourcentage <= 75 ? 3 : 4;
         });
     };
 
-    // Préparation des données pour le LineChart
     const quarts = calculateQuartiles();
-    const datesFormatted = resultats.map(r => format(new Date(r.concours_date), 'dd-MM'));
+    const datesFormatted = filteredResults.map(r => format(new Date(r.concours_date), 'dd-MM'));
+
     const dataForChart = {
         labels: datesFormatted,
         datasets: [
@@ -76,7 +71,6 @@ const Chart = ({ navigation }) => {
             },
         ],
     };
-
 
     const screenWidth = Dimensions.get('window').width;
     const chartConfig = {
@@ -99,6 +93,23 @@ const Chart = ({ navigation }) => {
         <View style={styles.container}>
             <ImageBackground source={bgImage} resizeMode="cover" style={styles.imagebg}>
                 <Text style={styles.title}>Suivi des résultats</Text>
+                <View style={styles.flex}>
+                    {discipline.map((dis, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            onPress={() => handleFilter(dis.value)}
+                            style={[
+                                styles.btn,
+                                selectedDiscipline === dis.value && styles.selectedBtn // Appliquer le style selectedBtn si la discipline est sélectionnée
+                            ]}
+                        >
+                            <Text style={styles.txt}>{dis.label}</Text>
+                        </TouchableOpacity>
+                    ))}
+                    <TouchableOpacity onPress={() => setSelectedDiscipline(null)} style={styles.btn}>
+                        <Text style={styles.txt}>Voir tous</Text>
+                    </TouchableOpacity>
+                </View> 
                 <LineChart
                     data={dataForChart}
                     width={screenWidth}
@@ -132,6 +143,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    btn: {
+        backgroundColor: '#A68677', // Couleur de fond du bouton par défaut
+        padding: 10,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginVertical: 5,
+    },
+    selectedBtn: {
+        backgroundColor: '#C38D6B', // Couleur de fond du bouton lorsqu'il est sélectionné
+    },
+    txt: {
+        color: 'white',
+    },
+      flex: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignSelf: 'stretch',
+        alignItems: 'center',
+      },
     // Autres styles...
 });
 

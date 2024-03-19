@@ -32,5 +32,32 @@ router.post('/showconcours', (req, res) => {
   });
 });
 
+router.get('/show/:id', (req, res) => {
+  const { token, id } = req.body;
+
+  // Vérifier si le token est valide
+  jwt.verify(token, process.env.JWT_SECRET, (error, decodedToken) => {
+    if (error) {
+      console.error(error);
+      res.status(401).send('Token invalide');
+    } else {
+      // decode the token
+      const userId = decodedToken.id;
+
+      const query = 'SELECT * FROM concours WHERE discipline_id = ?';
+      pool.query(query, [id], (error, results) => {
+        if (error) {
+          console.error(error);
+          res.status(500).send('Erreur du serveur');
+        } else {
+          res.status(200).json(results);
+        }
+      });
+    }
+  });
+
+
+});
+
 
 module.exports = router;

@@ -1,12 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, Image, TextInput , ImageBackground } from 'react-native';
 import axios from 'react-native-axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import EnregCheval from './EnregCheval';
 
 const InfosCheval = ({ navigation }) => {
+    const [meschevaux, setMesChevaux] = useState([]);
 
     useEffect(() => {
+        const fetchResultats = async () => {
+            try {
+                const token = await AsyncStorage.getItem('userToken');
+                // Assurez-vous d'envoyer le token si nécessaire pour votre endpoint
+                const response = await axios.post('http://10.0.2.2:3000/infoscompte/meschevaux', { token });
+                // console.log(response.data);
+                setMesChevaux(response.data);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des concours :', error);
+            }
+        };
+
+        fetchResultats();
     }, []);
 
     return (
@@ -14,7 +29,13 @@ const InfosCheval = ({ navigation }) => {
             
                 <View >
                 <Text style={styles.title}>Mes chevaux</Text>
-        
+                {meschevaux.map(cheval => (
+                    <View style={styles.discipline} key={cheval.cheval_id}>
+                        <Text>{cheval.cheval_name}</Text>
+                    </View>
+                ))
+                    
+                }
                 
                 </View>
                 <EnregCheval />

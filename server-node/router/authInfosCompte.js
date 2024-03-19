@@ -66,6 +66,25 @@ router.post('/cheval', async (req, res) => {
   }
 });
 
+
+router.post('/meschevaux', async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decodedToken.id;
+
+    const query = 'SELECT * FROM cheval INNER JOIN propriete ON cheval.cheval_id = propriete.cheval_id WHERE propriete.id_user = ?';
+    const [results] = await pool.promise().query(query, [userId]);
+
+    res.status(200).json(results);
+  }
+  catch(error){
+    console.error(error);
+    res.status(401).send('Token invalide');
+  }
+});
+
 router.post('/propriete', async (req, res) => {
   const { token } = req.body;
 
