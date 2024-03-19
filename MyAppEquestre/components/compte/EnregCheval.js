@@ -36,10 +36,9 @@ const EnregCheval = ({ navigation }) => {
                     style={styles.input}
                     onChangeText={setNomCheval} // Utilisez onChangeText pour mettre à jour l'état
                 />
-                <Button
-                    title="Enregistrer mon cheval"
-                    onPress={handleCheval}
-                />
+                <TouchableOpacity style={styles.button} onPress={handleCheval}>
+                    <Text style={styles.buttonText}>Enregistrer mon cheval</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -86,6 +85,18 @@ const styles = StyleSheet.create({
         backgroundColor: '#EDDCD4',
         color: '#A68677',
       },
+      button: {
+        backgroundColor: '#C38D6B', 
+        padding: 10, 
+        borderRadius: 10, 
+        alignItems: 'center', 
+        marginVertical: 5,
+        width: 250,
+        alignSelf: 'center', 
+      },
+      buttonText: {
+        color: '#EDDCD4',
+      }, 
 });
 
 export default EnregCheval;

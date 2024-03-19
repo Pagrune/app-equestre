@@ -47,10 +47,10 @@ const InfosCavalier = ({ navigation }) => {
                     placeholder='Prénom'
                     onChangeText={(val) => setPrenomCavalier(val)}  
                 />
-                <Button
-                    title="Enregistrer infos Cavalier"
-                    onPress={handleInfosCavalier}
-                />
+                <TouchableOpacity style={styles.button} onPress={handleInfosCavalier}>
+                    <Text style={styles.buttonText}>Enregistrer mes informations</Text>
+                </TouchableOpacity>
+                
             </View>
         </View>
     );
@@ -97,6 +97,18 @@ const styles = StyleSheet.create({
         backgroundColor: '#EDDCD4',
         color: '#A68677',
       },
+      button: {
+        backgroundColor: '#C38D6B', 
+        padding: 10, 
+        borderRadius: 10, 
+        alignItems: 'center', 
+        marginVertical: 5,
+        width: 250,
+        alignSelf: 'center', 
+      },
+      buttonText: {
+        color: '#EDDCD4',
+      }, 
 });
 
 export default InfosCavalier;
